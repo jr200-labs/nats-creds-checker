@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"go.uber.org/zap"
 
 	"github.com/jr200/nats-creds-checker/internal/report"
 	"github.com/jr200/nats-creds-checker/internal/validate"
@@ -13,21 +14,24 @@ import (
 var version = "dev"
 
 func main() {
+	log, _ := zap.NewProduction()
+	defer log.Sync()
+
 	rootCmd := &cobra.Command{
 		Use:     "nats-creds-checker",
 		Short:   "NATS credential validation and reporting tool",
 		Version: version,
 	}
 
-	rootCmd.AddCommand(validateCmd())
-	rootCmd.AddCommand(reportCmd())
+	rootCmd.AddCommand(validateCmd(log))
+	rootCmd.AddCommand(reportCmd(log))
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
-func validateCmd() *cobra.Command {
+func validateCmd(log *zap.Logger) *cobra.Command {
 	var (
 		credsFile   string
 		credsB64Env string
@@ -58,7 +62,7 @@ func validateCmd() *cobra.Command {
 				return fmt.Errorf("at least one of --creds-file, --creds-b64-env, or --creds-dir must be specified")
 			}
 
-			return validate.RunAll(checks)
+			return validate.RunAll(log, checks)
 		},
 	}
 
@@ -71,7 +75,7 @@ func validateCmd() *cobra.Command {
 	return cmd
 }
 
-func reportCmd() *cobra.Command {
+func reportCmd(log *zap.Logger) *cobra.Command {
 	var (
 		monitorURL string
 		credsFile  string
@@ -82,7 +86,7 @@ func reportCmd() *cobra.Command {
 		Use:   "report",
 		Short: "Report NATS credential status, account health, and connection info",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return report.Run(monitorURL, credsFile, tlsCA)
+			return report.Run(log, monitorURL, credsFile, tlsCA)
 		},
 	}
 

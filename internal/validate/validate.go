@@ -1,6 +1,6 @@
 package validate
 
-import "fmt"
+import "go.uber.org/zap"
 
 // Check represents a single credential validation check.
 type Check struct {
@@ -9,15 +9,15 @@ type Check struct {
 }
 
 // RunAll executes all checks and returns the first error encountered.
-func RunAll(checks []Check) error {
+func RunAll(log *zap.Logger, checks []Check) error {
 	for _, c := range checks {
-		fmt.Printf("Checking: %s\n", c.Name)
+		log.Info("checking", zap.String("check", c.Name))
 		if err := c.Fn(); err != nil {
-			fmt.Printf("FATAL: %s — %v\n", c.Name, err)
+			log.Error("check failed", zap.String("check", c.Name), zap.Error(err))
 			return err
 		}
-		fmt.Printf("OK: %s\n", c.Name)
+		log.Info("check passed", zap.String("check", c.Name))
 	}
-	fmt.Println("All credential checks passed")
+	log.Info("all credential checks passed")
 	return nil
 }
