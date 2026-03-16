@@ -11,7 +11,7 @@ on:
         description: "checkout ref"
         required: false
         type: string
-        default: "refs/heads/main"
+        default: "refs/heads/master"
       tag:
         description: docker-image-tag
         required: false
@@ -43,3 +43,15 @@ jobs:
     secrets:
       registry_username: ${{ github.actor }}
       registry_token: ${{ secrets.GITHUB_TOKEN }}
+
+  spawn-workflow:
+    needs: main
+    runs-on: ubuntu-latest
+    steps:
+      - name: dispatch-next-workflow
+        uses: peter-evans/repository-dispatch@v3
+        if: github.event_name != 'workflow_dispatch'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: dispatch-publish-release
+          client-payload: ${{ toJson(github.event.client_payload) }}
