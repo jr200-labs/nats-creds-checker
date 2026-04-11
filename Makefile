@@ -19,4 +19,4 @@ docker:
 	docker build -f docker/Dockerfile \
 		--build-arg BUILD_OS=$(BUILD_OS) \
 		--build-arg BUILD_ARCH=$(BUILD_ARCH) \
-		-t ghcr.io/jr200/nats-creds-checker:$(VERSION) .
+		-t ghcr.io/jr200-labs/nats-creds-checker:$(VERSION) .
