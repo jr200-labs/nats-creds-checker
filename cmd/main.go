@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 
-	"github.com/jr200/nats-creds-checker/internal/report"
-	"github.com/jr200/nats-creds-checker/internal/validate"
+	"github.com/jr200-labs/nats-creds-checker/internal/report"
+	"github.com/jr200-labs/nats-creds-checker/internal/validate"
 )
 
 var version = "dev"

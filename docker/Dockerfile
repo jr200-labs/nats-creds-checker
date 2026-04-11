@@ -19,7 +19,7 @@ RUN CGO_ENABLED=0 GOOS=${BUILD_OS} GOARCH=${BUILD_ARCH} \
 
 FROM alpine:3
 
-LABEL org.opencontainers.image.source="https://github.com/jr200/nats-creds-checker"
+LABEL org.opencontainers.image.source="https://github.com/jr200-labs/nats-creds-checker"
 LABEL org.opencontainers.image.description="NATS credential validation and reporting tool"
 
 RUN apk add --no-cache ca-certificates
