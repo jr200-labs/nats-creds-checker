@@ -1,0 +1,46 @@
+name: renovate
+
+# Self-hosted Renovate via the shared template at
+# jr200-labs/github-action-templates. Replaces Mend Cloud's hosted
+# Renovate. Runs on cron + manual trigger. Per-repo behaviour is
+# configured via this repo's renovate.json which extends
+# `github>jr200-labs/github-action-templates`.
+
+on:
+  schedule:
+    # Every 4 hours, offset by 17 minutes to avoid the GitHub cron rush.
+    - cron: '17 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      log-level:
+        description: Renovate log level
+        required: false
+        type: choice
+        default: info
+        options: [info, debug, trace]
+      dry-run:
+        description: Renovate dry-run mode (leave empty for normal)
+        required: false
+        type: choice
+        default: ''
+        options: ['', full, extract, lookup]
+
+jobs:
+  renovate:
+    uses: jr200-labs/github-action-templates/.github/workflows/renovate.yml@main
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    with:
+      log-level: ${{ inputs.log-level || 'info' }}
+      dry-run: ${{ inputs.dry-run || '' }}
+    # Both this repo (nats-creds-checker) and github-action-templates
+    # live in the jr200-labs org, so secrets: inherit would also work
+    # here. Keeping the explicit pass-through to match the consistent
+    # pattern across the rest of the polyglot stack — most consumers
+    # are in the whengas org and need the explicit form because GitHub
+    # Actions does NOT inherit secrets across orgs (variables yes,
+    # secrets no).
+    secrets:
+      INTEGRATION_APP_PRIVATE_KEY: ${{ secrets.INTEGRATION_APP_PRIVATE_KEY }}
