@@ -2,7 +2,17 @@ BUILD_OS ?= $(shell go env GOOS)
 BUILD_ARCH ?= $(shell go env GOARCH)
 VERSION ?= $(shell cat VERSION 2>/dev/null || echo dev)
 
-.PHONY: build test clean docker
+.PHONY: build test clean docker lint sync-shared-lint
+
+sync-shared-lint:
+	@mkdir -p .shared
+	@curl -sfL "https://raw.githubusercontent.com/jr200-labs/github-action-templates/master/shared/sync-shared-lint.sh" -o .shared/sync-shared-lint.sh
+	@chmod +x .shared/sync-shared-lint.sh
+	@./.shared/sync-shared-lint.sh go
+
+lint: sync-shared-lint
+	go vet ./...
+	golangci-lint run --config .shared/.golangci.yml --timeout=5m
 
 build:
 	CGO_ENABLED=0 GOOS=$(BUILD_OS) GOARCH=$(BUILD_ARCH) \

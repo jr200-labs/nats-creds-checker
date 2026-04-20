@@ -177,11 +177,11 @@ func reportJWTExpiry(log *zap.Logger, claims *jwt.AccountClaims) {
 }
 
 func checkAuthCallout(log *zap.Logger, claims *jwt.AccountClaims, connz *connzResponse) {
-	if !claims.Account.HasExternalAuthorization() {
+	if !claims.HasExternalAuthorization() {
 		return
 	}
 
-	authUsers := claims.Account.Authorization.AuthUsers
+	authUsers := claims.Authorization.AuthUsers
 	log.Info("auth callout configured", zap.Int("auth_users", len(authUsers)))
 
 	if connz == nil {
@@ -270,7 +270,7 @@ func httpGet(url string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("GET %s: %w", url, err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("GET %s: status %d", url, resp.StatusCode)

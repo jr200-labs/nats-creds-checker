@@ -19,7 +19,7 @@ var version = "dev"
 
 func main() {
 	log, _ := zap.NewProduction()
-	defer log.Sync()
+	defer func() { _ = log.Sync() }()
 
 	rootCmd := &cobra.Command{
 		Use:     "nats-creds-checker",
@@ -124,7 +124,9 @@ func serveCmd(log *zap.Logger) *cobra.Command {
 			)
 
 			// Run immediately on startup.
-			report.Run(log, monitorURL, credsFile, tlsCA)
+			if err := report.Run(log, monitorURL, credsFile, tlsCA); err != nil {
+				log.Error("report failed", zap.Error(err))
+			}
 
 			ticker := time.NewTicker(interval)
 			defer ticker.Stop()
@@ -135,7 +137,9 @@ func serveCmd(log *zap.Logger) *cobra.Command {
 					log.Info("shutting down")
 					return nil
 				case <-ticker.C:
-					report.Run(log, monitorURL, credsFile, tlsCA)
+					if err := report.Run(log, monitorURL, credsFile, tlsCA); err != nil {
+						log.Error("report failed", zap.Error(err))
+					}
 				}
 			}
 		},
