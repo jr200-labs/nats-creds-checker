@@ -177,11 +177,11 @@ func reportJWTExpiry(log *zap.Logger, claims *jwt.AccountClaims) {
 }
 
 func checkAuthCallout(log *zap.Logger, claims *jwt.AccountClaims, connz *connzResponse) {
-	if !claims.HasExternalAuthorization() {
+	if !claims.Account.HasExternalAuthorization() {
 		return
 	}
 
-	authUsers := claims.Authorization.AuthUsers
+	authUsers := claims.Account.Authorization.AuthUsers
 	log.Info("auth callout configured", zap.Int("auth_users", len(authUsers)))
 
 	if connz == nil {
