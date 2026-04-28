@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	github.com/nats-io/jwt/v2 v2.8.1
 	github.com/spf13/cobra v1.10.2
-	go.uber.org/zap v1.27.1
+	go.uber.org/zap v1.28.0
 )
 
 require (
